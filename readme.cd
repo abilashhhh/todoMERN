@@ -7,3 +7,5 @@ npm install -D tailwindcss@3 postcss autoprefixer
 npx tailwindcss init -p
 
 #GoogleFonts : https://fonts.google.com/?query=poppins
+
+npm i react-icons
