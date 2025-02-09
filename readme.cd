@@ -1,0 +1,9 @@
+npm create vite@latest notes-app
+npm run dev
+npm i react-router-dom
+
+#Tailwindcss : https://v3.tailwindcss.com/docs/guides/vite
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
+
+#GoogleFonts : https://fonts.google.com/?query=poppins
