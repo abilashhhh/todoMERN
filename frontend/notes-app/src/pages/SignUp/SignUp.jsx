@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import PasswordInput from "../../components/Password/PasswordInput";
+import PasswordInput from "../../components/Input/PasswordInput";
 import { Link } from "react-router-dom";
 import { validateEmail, validatePassword } from "../../utils/helper";
 

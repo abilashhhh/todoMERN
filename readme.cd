@@ -10,3 +10,6 @@ npx tailwindcss init -p
 
 npm i react-icons
 
+npm install lucide-react
+
+npm i react-modal
