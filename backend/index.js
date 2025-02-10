@@ -135,9 +135,9 @@ app.get("/get-user", authenticateToken, async (req, res) => {
     return res.json({
         // user: isUser ,
         user: {
-            fullName: isUser.fullName, 
-            email: isUser.email, 
-            "_id": isUser._id, 
+            fullName: isUser.fullName,
+            email: isUser.email,
+            "_id": isUser._id,
             createdOn: isUser.createdOn
         },
         message: "Get user successfull",
@@ -308,6 +308,44 @@ app.put("/pin-note/:noteId", authenticateToken, async (req, res) => {
             note,
             message: "Note pinned successfully"
         });
+
+    } catch (error) {
+        return res
+            .status(500)
+            .json({
+                error: true,
+                message: "Internal server error"
+            });
+    }
+})
+
+//search-notes
+app.get("/search-notes", authenticateToken, async (req, res) => {
+    const { user } = req.user;
+    const { query } = req.query;
+    if (!query) {
+        return res
+            .status(400)
+            .json({
+                error: true,
+                message: "Search query is required"
+            });
+    }
+
+    try {
+        const matchingNotes = await Note.find({
+            userId: user._id,
+            $or: [
+                { title: { $regex: new RegExp(query, "i") } },
+                { content: { $regex: new RegExp(query, "i") } },
+            ]
+        })
+ 
+        return res.json({
+            error:false,
+            notes: matchingNotes,
+            message: "Notes matching the search query retrieved successfully"
+        })
 
     } catch (error) {
         return res
