@@ -1,14 +1,23 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
 
-const SearchBar = ({ value, userInfo, onChange, handleSearch, onClearSearch }) => {
+const SearchBar = ({
+  value,
+  userInfo,
+  onChange,
+  handleSearch,
+  onClearSearch,
+}) => {
+  
   useEffect(() => {
     if (value) {
       handleSearch();
-    } else {
+    } 
+    if(value.trim() === ""){
       onClearSearch();
     }
   }, [value]);
