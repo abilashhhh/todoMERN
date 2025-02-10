@@ -125,8 +125,6 @@ app.post("/login", async (req, res) => {
 //add-note
 app.post("/add-note", authenticateToken, async (req, res) => {
     const { title, content, tags } = req.body;
-    // console.log("req.body :", req.body)
-    // console.log("req.user :", req.user)
     const { user } = req.user;
 
     if (!title) {
@@ -145,7 +143,6 @@ app.post("/add-note", authenticateToken, async (req, res) => {
             title,
             content,
             tags: tags || [],
-            isPinned,
             userId: user._id
         })
         await note.save();
@@ -246,22 +243,60 @@ app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
                 })
         }
 
-        await Note.deleteOne({ _id: noteId, userId: user._id })
+        await Note.deleteOne({ _id: noteId, userId: user._id });
+
         return res
             .json({
                 error: false,
                 message: "Note deleted successfully"
-            })
+            });
 
     } catch (error) {
         return res
-        .status(500)
-        .json({
-            error: true,
-            message: "Internal server error"
-        });
+            .status(500)
+            .json({
+                error: true,
+                message: "Internal server error"
+            });
     }
 })
+
+//pin-note
+app.put("/pin-note/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { isPinned } = req.body;
+    const { user } = req.user;
+
+    try {
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
+
+        if (!note) {
+            return res.json({
+                error: true,
+                message: "Note not found"
+            });
+        }
+
+        if (isPinned) note.isPinned = isPinned || false
+
+        await note.save()
+
+        return res.json({
+            error: false,
+            note,
+            message: "Note pinned successfully"
+        });
+
+    } catch (error) {
+        return res
+            .status(500)
+            .json({
+                error: true,
+                message: "Internal server error"
+            });
+    }
+})
+
 app.listen(8000)
 
 module.exports = app;
