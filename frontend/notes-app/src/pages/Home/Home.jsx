@@ -8,25 +8,66 @@ import AddEditNotes from "./AddEditNotes";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
+import Toast from "../../components/ToastMessage/Toast";
 
 const Home = () => {
+
   const [openAddEditModal, setOpenAddEditModal] = useState({
     isShown: false,
     type: "add",
     data: null,
   });
 
+  const [showToastMsg, setShowToastMsg] = useState({
+    isShown: false,
+    type: "add",
+    message: "",
+  });
+
   const [userInfo, setUserInfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
   const navigate = useNavigate();
 
-  const handleEdit = (noteDetails) => {
+  // edit
+  const handleEdit = noteDetails => {
     setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
   };
 
-  // const handleDelete = noteDetails => {
-  // setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
-  // };
+  // delete
+  const handleDelete = async(data) => {
+    const noteId = data._id;
+    try {
+      const response = await axiosInstance.delete("/delete-note/" + noteId);
+
+      if (response.data && !response.data.error) {
+        showToastMessage("Note deleted successfully", "delete")
+        getAllNotes();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        console.log("An unexpected error occurred");
+      }
+    }
+  };
+
+  const showToastMessage = (message, type) => {
+    setShowToastMsg({
+      isShown: true,
+      message,
+      type,
+    });
+  };
+
+  const handleCloseToast = () => {
+    setShowToastMsg({
+      isShown: false,
+      message: "",
+    });
+  };
 
   // get user info
   const getUserInfo = async () => {
@@ -76,7 +117,7 @@ const Home = () => {
               content={item.content}
               tags={item.tags}
               onPinNote={() => {}}
-              // onDelete={() => handleDelete(item)}
+              onDelete={() => handleDelete(item)}
               onEdit={() => handleEdit(item)}
               isPinned={item.isPinned}
             />
@@ -109,8 +150,16 @@ const Home = () => {
             setOpenAddEditModal({ isShown: false, type: "add", data: null });
           }}
           getAllNotes={getAllNotes}
+          showToastMessage={showToastMessage}
         />
       </Modal>
+
+      <Toast
+        isShown={showToastMsg.isShown}
+        message={showToastMsg.message}
+        type={showToastMsg.type}
+        onClose={handleCloseToast}
+      />
     </div>
   );
 };
