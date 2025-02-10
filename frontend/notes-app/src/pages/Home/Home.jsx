@@ -10,7 +10,8 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 import Toast from "../../components/ToastMessage/Toast";
 import EmptyCard from "../../components/Cards/EmptyCard";
-import notes from "../../../src/assets/images/notes.svg"
+import notes from "../../../src/assets/images/notes.svg";
+import noDataFound from "../../../src/assets/images/search.svg";
 
 const Home = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -27,6 +28,7 @@ const Home = () => {
 
   const [userInfo, setUserInfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
+  const [isSearch, setIsSearch] = useState(false);
   const navigate = useNavigate();
 
   // edit
@@ -97,6 +99,46 @@ const Home = () => {
     }
   };
 
+  // search
+  const onSearchNote = async query => {
+    try {
+      const response = await axiosInstance.get("/search-notes", {
+        params: { query },
+      });
+
+      if (response.data && response.data.notes) {
+        setIsSearch(true);
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log("An unexpected error occurred ", error);
+    }
+  };
+
+  // clear search
+  const handleClearSearch = () => {
+    setIsSearch(false);
+    getAllNotes();
+  };
+
+  // pin
+  const updateIsPinned = async noteData => {
+    try {
+      const noteId = noteData._id;
+
+      const response = await axiosInstance.put("/pin-note/" + noteId, {
+        isPinned: !noteData.isPinned,
+      });
+
+      if (response.data && response.data.note) {
+        showToastMessage("Note updated successfully");
+        getAllNotes();
+      }
+    } catch (error) {
+      console.log("Error updating note:", error);
+    }
+  };
+
   useEffect(() => {
     getUserInfo();
     getAllNotes();
@@ -106,7 +148,11 @@ const Home = () => {
 
   return (
     <div>
-      <Navbar userInfo={userInfo} />
+      <Navbar
+        userInfo={userInfo}
+        onSearchNote={onSearchNote}
+        handleClearSearch={handleClearSearch}
+      />
 
       <div className="container mx-auto">
         {allNotes.length > 0 ? (
@@ -118,15 +164,22 @@ const Home = () => {
                 date={item.createdOn}
                 content={item.content}
                 tags={item.tags}
-                onPinNote={() => {}}
+                isPinned={item.isPinned}
                 onDelete={() => handleDelete(item)}
                 onEdit={() => handleEdit(item)}
-                isPinned={item.isPinned}
+                onPinNote={() => updateIsPinned(item)}
               />
             ))}
           </div>
         ) : (
-          <EmptyCard imgSrc={notes} message='Start creating your first note...'/>
+          <EmptyCard
+            imgSrc={isSearch ? noDataFound : notes}
+            message={
+              isSearch
+                ? "Oops!.. No data found "
+                : "Start creating your first note..."
+            }
+          />
         )}
       </div>
 

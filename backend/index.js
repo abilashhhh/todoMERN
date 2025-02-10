@@ -291,18 +291,20 @@ app.put("/pin-note/:noteId", authenticateToken, async (req, res) => {
 
     try {
         const note = await Note.findOne({ _id: noteId, userId: user._id });
-
+ 
         if (!note) {
-            return res.json({
+             return res.json({
                 error: true,
                 message: "Note not found"
             });
         }
 
-        if (isPinned) note.isPinned = isPinned || false
+        if (isPinned !== undefined) {
+            note.isPinned = isPinned;
+         }
 
-        await note.save()
-
+        await note.save();
+ 
         return res.json({
             error: false,
             note,
@@ -310,14 +312,14 @@ app.put("/pin-note/:noteId", authenticateToken, async (req, res) => {
         });
 
     } catch (error) {
-        return res
+         return res
             .status(500)
             .json({
                 error: true,
                 message: "Internal server error"
             });
     }
-})
+});
 
 //search-notes
 app.get("/search-notes", authenticateToken, async (req, res) => {
