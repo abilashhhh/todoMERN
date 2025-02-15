@@ -12,14 +12,13 @@ const SearchBar = ({
   handleSearch,
   onClearSearch,
 }) => {
-  
   useEffect(() => {
-    if (value) {
+    if (value && value.trim() !== "") {
       handleSearch();
-    } 
-    if(value.trim() === ""){
-      onClearSearch();
     }
+    // else {
+    //   onClearSearch();
+    // }
   }, [value]);
 
   return (

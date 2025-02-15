@@ -117,8 +117,9 @@ const Home = () => {
 
   // clear search
   const handleClearSearch = () => {
-    setIsSearch(false);
     getAllNotes();
+    setIsSearch(false);
+    
   };
 
   // pin
